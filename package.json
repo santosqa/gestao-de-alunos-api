@@ -6,20 +6,30 @@
   "type": "module",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "start:test": "NODE_ENV=test node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "npm run --silent test:internal && npm run --silent test:external",
+    "test:internal": "NODE_ENV=test mocha \"test/internal/**/*.test.js\"",
+    "test:external": "NODE_ENV=test mocha \"test/external/**/*.test.js\""
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "chai": "^6.2.2",
     "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
     "express": "^4.19.2",
     "js-yaml": "^4.1.0",
     "jsonwebtoken": "^9.0.2",
+    "mocha": "^11.8.0",
     "morgan": "^1.10.0",
+    "sinon": "^22.1.0",
+    "supertest": "^7.2.2",
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
+    "@faker-js/faker": "^10.6.0",
     "nodemon": "^3.1.4"
   }
 }

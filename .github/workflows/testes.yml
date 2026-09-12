@@ -1,0 +1,41 @@
+name: Testes de API
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  testes:
+    runs-on: ubuntu-latest
+    env:
+      BASE_URL: ${{ secrets.BASE_URL }}
+      ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+      ADMIN_SENHA: ${{ secrets.ADMIN_SENHA }}
+
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v4
+      - name: Preparar o Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Instalar dependências
+        run: npm ci
+      - name: Executar testes internos
+        run: npm run test:internal
+      - name: Executar testes externos
+        run: |
+          npm run --silent start:test &
+          servidor_pid=$!
+          trap 'kill "$servidor_pid"' EXIT
+          api_pronta=false
+          for tentativa in {1..10}; do
+            if curl --fail http://localhost:3000/; then
+              api_pronta=true
+              break
+            fi
+            sleep 1
+          done
+          if [ "$api_pronta" = false ]; then exit 1; fi
+          npm run test:external
